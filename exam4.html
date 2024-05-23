@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<!--글작성 수정 삭제 조회-->
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>온라인 댓글 게시판</title>
+</head>
+
+<body>
+    <h1>온라인 댓글 게시판</h1>
+    <div>
+        <label for="content">내용을 입력하세요: </label>
+        <input type="text" id="content" name="content">
+        <button id="button">작성</button>
+    </div>
+
+    <div id="commentList"></div>
+
+    <script>
+        var id_num = 1;
+
+        function createCommentElement(content) {
+            var commentElement = document.createElement('p');
+            commentElement.id = 'P' + id_num;
+
+            var updateButton = document.createElement('button');
+            updateButton.id = 'U' + id_num;
+            updateButton.textContent = '수정';
+            updateButton.addEventListener('click', showUpdateInput);
+
+            var deleteButton = document.createElement('button');
+            deleteButton.id = 'D' + id_num;
+            deleteButton.textContent = '삭제';
+            deleteButton.addEventListener('click', deleteComment);
+
+            commentElement.appendChild(updateButton);
+            commentElement.appendChild(document.createTextNode(' '));
+            commentElement.appendChild(deleteButton);
+            commentElement.appendChild(document.createElement('br'));
+            commentElement.appendChild(document.createTextNode(content));
+            
+            id_num++;
+            return commentElement;
+        }
+
+        function showcomment() {
+            var content = document.getElementById("content").value;
+            if (content.trim() !== '') {
+                var commentList = document.getElementById('commentList');
+                var commentElement = createCommentElement(content);
+                commentList.appendChild(commentElement);
+                document.getElementById("content").value = '';
+            }
+        }
+
+        function deleteComment(event) {
+            if (event.target.id.match(/\D/) == 'D') {
+                event.currentTarget.remove();
+            }
+        }
+
+        function showUpdateInput(event) {
+            if (event.target.id.match(/\D/) == 'U') {
+                var updateInput = document.createElement('input');
+                updateInput.className = 'update';
+                updateInput.id = 'blink';
+                updateInput.addEventListener('keydown', function (event) {
+                    if (event.key === 'Enter') {
+                        updateContent(event);
+                    }
+                });
+
+                var updateButton = event.target;
+                updateButton.parentElement.insertBefore(updateInput, updateButton.nextSibling);
+                updateButton.parentElement.insertBefore(document.createElement('br'), updateButton.nextSibling);
+
+                var confirmButton = document.createElement('button');
+                confirmButton.className = 'update';
+                confirmButton.id = 'checkB';
+                confirmButton.textContent = '확인';
+                confirmButton.addEventListener('click', function() {
+                    updateContent(event);
+                    removeUpdateInput(event.currentTarget.parentElement);
+                });
+
+                updateButton.parentElement.insertBefore(confirmButton, updateInput.nextSibling);
+                updateInput.focus();
+            }
+        }
+
+        function updateContent(event) {
+            var content = document.getElementById('blink').value;
+            var commentElement = event.currentTarget.parentElement;
+            commentElement.lastChild.textContent = content;
+            document.getElementById('blink').value = '';
+        }
+
+        function removeUpdateInput(commentElement) {
+            var updateInputs = commentElement.getElementsByClassName('update');
+            while (updateInputs.length > 0) {
+                updateInputs[0].remove();
+            }
+        }
+
+        var enter = document.getElementById("content");
+        var butt = document.getElementById("button");
+
+        enter.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                showcomment();
+            }
+        });
+        butt.addEventListener('click', showcomment);
+    </script>
+</body>
+
+</html>

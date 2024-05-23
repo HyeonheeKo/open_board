@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>예제</title>
+</head>
+
+<body>
+    <div id='searchDiv'>
+        <label for='searchIn'>댓글 검색:</label>
+        <input type="text" id="searchIn" name="searchIn" />
+        <button id="searchB" onclick="search()">검색</button>
+
+        <hr color="black">
+    </div>
+
+    <div id="contentList">
+        <p id="C1">가</p>
+        <p id="C2">나</p>
+        <p id="C3">다</p>
+        <p id="C4">다</p>
+    </div>
+
+    <script>
+        document.getElementById('searchIn').addEventListener('keydown', search);
+        localStorage.setItem('contentList', document.getElementById('contentList').innerHTML);
+
+        function search(event) {
+            if (event.key == 'Enter') {
+                let contentList_innerHTML = localStorage.getItem('contentList');
+                document.getElementById('contentList').innerHTML = contentList_innerHTML;
+
+                let parent = document.getElementById('contentList');
+                let childList = parent.querySelectorAll('p');
+                let input = document.getElementById('searchIn').value;
+
+                childList.forEach(paragraph => {
+                    if (!(paragraph.textContent.match(input))) {
+                        paragraph.remove()
+                    }
+                });
+            }
+        }
+
+    </script>
+</body>
+
+</html>

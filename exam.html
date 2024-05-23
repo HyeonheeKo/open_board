@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<!--글작성 수정 삭제 조회-->
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>exam 댓글 게시판</title>
+</head>
+
+<body>
+    <h1>온라인 댓글 게시판</h1>
+    <a href="1.html"><button>1페이지로 이동</button></a>
+    <div id = 'searchDiv'>
+        <label for = 'searchIn'>댓글 검색:</label>
+        <input type="text" id="searchIn" name="searchIn"/>
+        <button id="searchB">검색</button>
+
+        <hr color="black">
+    </div>
+    
+    <div>
+        <label for="content">내용을 입력하세요: </label>
+        <input type="text" id="content" name="content">
+        <button id="button">작성</button>
+        <hr color="gray" size="0.5">
+    </div>
+
+    <div>
+        <p id="commentList"></p>
+
+    </div>
+
+
+
+
+</body>
+<script src="search_script.js"></script>
+<script>
+
+    var id_num = 1;
+
+function showcomment() {   // 댓글 작성
+    let listP = document.createElement('p');   // 새 p 생성
+    listP.id = 'P' + id_num;
+
+    let listU = document.createElement('button'); // 수정 버튼 생성
+    listU.id = 'U' + id_num;
+    listU.appendChild(document.createTextNode('수정'));
+    listP.appendChild(listU);
+    listP.appendChild(document.createTextNode('  '));
+    listP.addEventListener('click', upComment);
+
+    let listD = document.createElement('button'); // 삭제버튼 생성
+    listD.id = 'D' + id_num;
+    listD.appendChild(document.createTextNode('삭제'));
+    listP.appendChild(listD);
+    listP.appendChild(document.createElement('br'));
+    listP.addEventListener('click', delComment);
+
+    let content = document.getElementById("content").value; // 내용 불러오기
+    let listC = document.createTextNode(content); // 새 p에 내용 띄우기
+    listC.id = 'C' + id_num;
+    listP.appendChild(listC);
+    document.getElementById('commentList').appendChild(listP);
+
+    // 댓글을 로컬 스토리지에 저장
+    saveCommentsToLocalStorage();
+
+    document.getElementById("content").value = ''; // input 값 삭제
+    id_num++;
+}
+
+function saveCommentsToLocalStorage() {
+    let commentList = document.getElementById('commentList').innerHTML;
+    localStorage.setItem('StorageComment', commentList);
+}
+
+function loadCommentsFromLocalStorage() {
+    let storedComments = localStorage.getItem('StorageComment');
+    if (storedComments) {
+        document.getElementById('commentList').innerHTML = storedComments;
+        let paragraphs = document.querySelectorAll('#commentList p');
+        id_num = paragraphs.length + 1;
+        paragraphs.forEach(function(paragraph) {
+            paragraph.addEventListener('click', upComment);
+            paragraph.addEventListener('click', delComment);
+        });
+    }
+}
+
+function delComment(event) {
+    if (event.target.id.match(/\D/) == 'D') {
+        event.currentTarget.remove();
+        saveCommentsToLocalStorage();
+    }
+}
+
+function upComment(event) {
+    if (event.target.id.match(/\D/) == 'U') {
+        let blink = document.createElement('input')
+        blink.className = 'update'
+        blink.id = 'blink'
+        blink.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                update_content();
+            }
+        });
+
+        let listP = event.currentTarget;
+        let listD = listP.getElementsByTagName('button')[1]
+
+        listP.insertBefore(blink, listD.nextSibling);
+        let check_br = document.createElement('br')
+        check_br.className = 'update'
+        listP.insertBefore(check_br, listD.nextSibling);
+
+        let check = document.createElement('button')
+        check.className = 'update'
+        check.id = 'checkB'
+        check.textContent = '확인'
+        check.onclick = update_content
+
+        listP.insertBefore(check, blink.nextSibling);
+    }
+}
+
+function update_content(event) {
+    let content = document.getElementById('blink').value
+    let last_content = event.currentTarget.parentElement.lastChild
+
+    last_content.textContent = content;
+    document.getElementById('blink').value = '';
+
+    let updateElements = event.currentTarget.parentElement.getElementsByClassName('update');
+    let updateArray = Array.from(updateElements);
+    updateArray.forEach(function (element) {
+        element.remove();
+    });
+
+    saveCommentsToLocalStorage();
+}
+
+let enter = document.getElementById("content");
+let butt = document.getElementById("button");
+
+enter.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter') {
+        showcomment();d
+    }
+});
+butt.addEventListener('click', showcomment);
+
+// 페이지 로드 시 로컬 스토리지에서 댓글 불러오기
+window.onload = loadCommentsFromLocalStorage;
+    
+</script>
+
+</html>
